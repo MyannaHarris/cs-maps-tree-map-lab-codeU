@@ -72,7 +72,24 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 		Comparable<? super K> k = (Comparable<? super K>) target;
 		
 		// the actual search
-        // TODO: Fill this in.
+        Node temp = root;
+        int cmp;
+        while(temp != null)
+        {
+          cmp = k.compareTo(temp.key);
+          if(cmp == 0)
+          {
+            return temp;
+          }
+          else if (cmp < 0)
+          {
+            temp = temp.left;
+          }
+          else
+          {
+            temp = temp.right;
+          }
+        }
         return null;
 	}
 
@@ -92,8 +109,28 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 
 	@Override
 	public boolean containsValue(Object target) {
-		return false;
+         if(target == null)
+         {
+          return false;
+         }
+		return checkTree(root, target);
 	}
+
+        private boolean checkTree(Node n, Object t)
+        {
+          if(n == null)
+          {
+           return false;
+          }
+          if(equals(t, n.value))
+          {
+           return true;
+          }
+          else
+          {
+           return checkTree(n.left, t) || checkTree(n.right, t);
+          }
+        }
 
 	@Override
 	public Set<Map.Entry<K, V>> entrySet() {
@@ -117,9 +154,21 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	@Override
 	public Set<K> keySet() {
 		Set<K> set = new LinkedHashSet<K>();
-        // TODO: Fill this in.
+                inOrder(set, root);
 		return set;
 	}
+
+        private Set<K> inOrder(Set<K> s, Node n)
+        {
+          if (n == null)
+          {
+            return s;
+          }
+          s = inOrder(s, n.left);
+          s.add(n.key);
+          s = inOrder(s, n.right);
+          return s;
+        }
 
 	@Override
 	public V put(K key, V value) {
@@ -135,8 +184,38 @@ public class MyTreeMap<K, V> implements Map<K, V> {
 	}
 
 	private V putHelper(Node node, K key, V value) {
-        // TODO: Fill this in.
-        return null;
+		@SuppressWarnings("unchecked")
+
+		Comparable<? super K> k = (Comparable<? super K>) key;
+        int cmp = k.compareTo(node.key);
+        if (cmp == 0)
+        {
+          V temp = node.value;
+          node.value = value;
+          return temp;
+        }
+        else if(cmp < 0)
+        {
+          if(node.left == null)
+          {
+            Node n = new Node(key, value);
+            node.left = n;
+            size++;
+            return null;
+          }
+          return putHelper(node.left, key, value);
+        }
+        else
+        {
+          if(node.right == null)
+          {
+            Node n = new Node(key, value);
+            node.right = n;
+            size++;
+            return null;
+          }
+          return putHelper(node.right, key, value);
+        }
 	}
 
 	@Override
